@@ -28,7 +28,19 @@ repository where the pre-push hook was active.
 The actions `install` and `uninstall` are conservative:
 
 *  `install` won't overwrite an existing pre-push hook
-*  `uninstall` will only uninstall itself; not any other pre-push hooks.
+*  `uninstall` will only uninstall itself; not any other pre-push
+   hooks.
+
+## What if it's too strict?
+
+If you have a `file.go` but really don't want to write a test for it
+(or maybe it's a demo file that doesn't require a test), then just
+create a file `file_test.go` and put in it nothing but the package
+declaration.
+
+If you have a directory that lacks a `doc.go`, then create one. Just
+put in a comment that this is an internal directory that deserves no
+docs, followed by the package declaration.
 
 ## Caveats
 
