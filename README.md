@@ -2,7 +2,7 @@
 
 `go-prepush-hook` is a simple Perl script that can install itself as your pre-push hook; i.e., it's run before `git push` actually pushes. It is heavily
 aimed at Go repositories that get pushed to http://github.com.
-Licence: GPLV3, see the file `LICENCE.md`.
+License: GPLV3, see the file `LICENSE.md`.
 
 What it does, is:
 
