@@ -25,6 +25,10 @@ you need to add/commit the `README.md`s and run `git push` again.
 
 ## How to install it
 
+You'll need Perl to install, run, or uninstall `go-prepush-hook`. It
+uses only very standard Perl packages that should be available on all
+(Linux or MacOSX) systems.
+
 1. Get the script, either copy & paste somewhere, or get the
    repository.
 1. Go to the Go repository that you want this to work with.
