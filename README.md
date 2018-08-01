@@ -9,15 +9,24 @@ following the same license rules.
 
 What it does, is:
 
-*  Every directory must have a `go.doc`.
-*  For every file `*.go`, a file `*_test.go` must exist.
-*  If you have `godocdown`, then in every directory a `README.md` will be
-   created from `go.doc`. (If you don't have `godocdown`, then you'll be
-   reminded to get it.)
-*  If you have one of the supported linters, then one will be run. The
-   linters are tried in the following order: `golint` and
-   `golangci-lint`. The second one is more exhaustive, but slower. (If
-   you don't have a linter, then you'll be reminded to get one.)
+* Every directory must have a `go.doc`.
+
+* For every file `*.go`, a file `*_test.go` must exist.
+
+* If you have `godocdown`, then in every directory a `README.md` will be
+  created from `go.doc`. (If you don't have `godocdown`, then you'll be
+  reminded to get it. More information is
+  [here](https://github.com/robertkrimen/godocdown).)
+   
+* If you have one of the supported linters, then one will be run. The
+  linters are tried in the following order (if you don't have a
+  linter, then you'll be reminded to get one):
+
+  * `golint`, fast but less exhaustive, more
+    information is [here](https://github.com/golang/lint)
+   
+  * `golangci-lint`, exhaustive but slow, more information is
+    [here](https://github.com/golangci/golangci-lint)
 
 As a slightly irritating side effect, `go-prepush-hook` may during its
 run create or update `README.md`s from `doc.go`s. When this happens,
@@ -31,8 +40,11 @@ uses only very standard Perl packages that should be available on all
 
 1. Get the script, either copy & paste somewhere, or get the
    repository.
+
 1. Go to the Go repository that you want this to work with.
+
 1. Run `/where/ever/you/put/it/go-prepush-hook install`.
+
 1. Upon the next `git push` of your Go repository, the pre-push hook
    will run.
 
@@ -42,9 +54,10 @@ repository where the pre-push hook was active.
 
 The actions `install` and `uninstall` are conservative:
 
-*  `install` won't overwrite an existing pre-push hook
-*  `uninstall` will only uninstall itself; not any other pre-push
-   hooks.
+* `install` won't overwrite an existing pre-push hook
+
+* `uninstall` will only uninstall itself; not any other pre-push
+  hooks.
 
 ## What if it's too strict?
 
