@@ -2,7 +2,10 @@
 
 `go-prepush-hook` is a simple Perl script that can install itself as your pre-push hook; i.e., it's run before `git push` actually pushes. It is heavily
 aimed at Go repositories that get pushed to http://github.com.
-License: GPLV3, see the file `LICENSE.md`.
+
+License: GPLV3, see the file `LICENSE.md`. Basically, do with it
+whatever you wish, but re-distribute any changes you might make
+following the same license rules.
 
 What it does, is:
 
@@ -14,9 +17,13 @@ What it does, is:
 *  If you have one of the supported linters, then one will be run. The
    linters are tried in the following order: `golint` and
    `golangci-lint`. The second one is more exhaustive, but slower. (If
-   you don't have a linter, then you'll be reminded to get one.)   
-   
-## How to use it
+   you don't have a linter, then you'll be reminded to get one.)
+
+As a slightly irritating side effect, `go-prepush-hook` may during its
+run create or update `README.md`s from `doc.go`s. When this happens,
+you need to add/commit the `README.md`s and run `git push` again.
+
+## How to install it
 
 1. Get the script, either copy & paste somewhere, or get the
    repository.
