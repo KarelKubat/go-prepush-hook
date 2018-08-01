@@ -13,10 +13,12 @@ use File::Compare;
 use File::Copy;
 use File::Find;
 
-my %dirs;				# dirs visited in pre-push checking
-my %errs;		       		# errors found
-my $hookname = '.git/hooks/pre-push';   # name of prepush hook
-my $godocdown = findbin('godocdown');   # do we have `godocdown`
+my %dirs;					# dirs visited 
+my %errs;		       			# errors found
+my $hookname = '.git/hooks/pre-push';   	# name of prepush hook
+my $godocdown = findbin('godocdown');   	# do we have `godocdown`
+my $golint = findbin('golint');         	# do we have `golint`
+my $golangci_lint = findbin('golangci-lint');   # do we have `golangci_lint`
 
 sub findbin {
     my $bin = shift;
@@ -98,7 +100,15 @@ sub run_prepush_checks {
 		}
 		unlink("README.prev") or die("Cannot unlink README.prev: $!\n");
 	    }
-	}	
+	}
+
+	if ($golint) {
+	    system("golint --set_exit_status .")
+	      and $errs{"Failed golint in $d"} = 1;
+	} elsif ($golangci_lint) {
+	    system("$golangci_lint run")
+	      and $errs{"Failed golangci_lint in $d"} = 1;
+	}
 	chdir($wd) || die("Cannot cd back into $wd: $!\n");
     }
     checkerrs();
@@ -110,9 +120,14 @@ sub run_prepush_checks {
 	exit(1);
     }
 
-    print("No README.md's could be generated. You should\n",
+    print("\nNo README.md's could be generated. You should\n",
 	  "  go get github.com/robertkrimen/godocdown/godocdown\n",
 	  "and make sure that it's in your path.\n") unless ($godocdown);
+    print("\nNeither golint nor golangci-lint were found. You should\n",
+	  "  go get -u golang.org/x/lint/golint",
+	  "or\n",
+	  "  go get -u github.com/golangci/golangci-lint/cmd/golangci-lint\n",
+	  "so that next time a linter can be included in the checks.\n");
 }
 
 sub install_self {

@@ -11,7 +11,11 @@ What it does, is:
 *  If you have `godocdown`, then in every directory a `README.md` will be
    created from `go.doc`. (If you don't have `godocdown`, then you'll be
    reminded to get it.)
-
+*  If you have one of the supported linters, then one will be run. The
+   linters are tried in the following order: `golint` and
+   `golangci-lint`. The second one is more exhaustive, but slower. (If
+   you don't have a linter, then you'll be reminded to get one.)   
+   
 ## How to use it
 
 1. Get the script, either copy & paste somewhere, or get the
