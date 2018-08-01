@@ -16,7 +16,15 @@ use File::Find;
 my %dirs;				# dirs visited in pre-push checking
 my %errs;		       		# errors found
 my $hookname = '.git/hooks/pre-push';   # name of prepush hook
-    
+my $godocdown = findbin('godocdown');   # do we have `godocdown`
+
+sub findbin {
+    my $bin = shift;
+    for my $e (split(/:/, $ENV{PATH})) {
+	return "$e/$bin" if (-x "$e/$bin");
+    }
+    return undef;
+}
 
 sub checkerrs {
     my $errfound = 0;
@@ -61,7 +69,7 @@ sub run_prepush_checks {
     find(\&wanted, ("."));
     checkerrs();
 
-    # In all directories, run `go test` and run `godocdown`.
+    # In all directories, run `go test` and run `godocdown` if we have it.
     my $readme_modified = 0;
     my $wd = getcwd();
     for my $d (sort(keys(%dirs))) {
@@ -69,28 +77,30 @@ sub run_prepush_checks {
 	
 	print("Running tests in $d\n");
 	system("go test") and $errs{"Failed 'go test' in $d"} = 1;
-	
-	if (! -f "README.md") {
-	    $readme_modified++;
-	    print("Generating $d/README.md\n");	
-	    system("godocdown . > README.md")
-	      and $errs{"failed 'godocdown' in $d"} = 1;
-	} else {
-	    unlink("README.prev");
-	    rename("README.md", "README.prev")
-	      or die("Failed to rename README.md to .prev: $!\n");
-	    if (system("godocdown . > README.md")) {
-		$errs{"failed 'godocdown' in $d"} = 1;
+
+	if ($godocdown) {
+	    if (! -f "README.md") {
+		$readme_modified++;
+		print("Generating $d/README.md\n");	
+		system("$godocdown . > README.md")
+		  and $errs{"failed 'godocdown' in $d"} = 1;
 	    } else {
-		if (compare("README.md", "README.prev")) {
-		    $readme_modified++;
-		    print("Regenerated $d/README.md\n");
+		unlink("README.prev");
+		rename("README.md", "README.prev")
+		  or die("Failed to rename README.md to .prev: $!\n");
+		if (system("$godocdown . > README.md")) {
+		    $errs{"failed 'godocdown' in $d"} = 1;
+		} else {
+		    if (compare("README.md", "README.prev")) {
+			$readme_modified++;
+			print("Regenerated $d/README.md\n");
+		    }
 		}
+		unlink("README.prev") or die("Cannot unlink README.prev: $!\n");
 	    }
-	    unlink("README.prev") or die("Cannot unlink README.prev: $!\n");
 	}	
 	chdir($wd) || die("Cannot cd back into $wd: $!\n");
-}
+    }
     checkerrs();
 
     if ($readme_modified > 0) {
@@ -99,6 +109,10 @@ sub run_prepush_checks {
 		      "Sorry for the inconvenience.\n");
 	exit(1);
     }
+
+    print("No README.md's could be generated. You should\n",
+	  "  go get github.com/robertkrimen/godocdown/godocdown\n",
+	  "and make sure that it's in your path.\n") unless ($godocdown);
 }
 
 sub install_self {
