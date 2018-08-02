@@ -127,7 +127,8 @@ sub run_prepush_checks {
 	  "  go get -u golang.org/x/lint/golint\n",
 	  "or\n",
 	  "  go get -u github.com/golangci/golangci-lint/cmd/golangci-lint\n",
-	  "so that next time a linter can be included in the checks.\n");
+	  "so that next time a linter can be included in the checks.\n")
+      unless ($golint or $golangci_lint);
 }
 
 sub install_self {
