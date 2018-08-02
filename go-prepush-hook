@@ -124,7 +124,7 @@ sub run_prepush_checks {
 	  "  go get github.com/robertkrimen/godocdown/godocdown\n",
 	  "and make sure that it's in your path.\n") unless ($godocdown);
     print("\nNeither golint nor golangci-lint were found. You should\n",
-	  "  go get -u golang.org/x/lint/golint",
+	  "  go get -u golang.org/x/lint/golint\n",
 	  "or\n",
 	  "  go get -u github.com/golangci/golangci-lint/cmd/golangci-lint\n",
 	  "so that next time a linter can be included in the checks.\n");
