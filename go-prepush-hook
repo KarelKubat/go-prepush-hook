@@ -4,8 +4,10 @@
 # 
 # Each directory must have a doc.go.
 # For each .go file, a _test.go must exist.
-# In each directory, `go test` is run.
-# In each directory, `godocdown` is run.
+# In each directory,
+# - `go test -v -race` is run
+# - `godocdown` is run if you have it on your system
+# - `golint` or `golangci-lint` is run if you have it on your system
 
 use strict;
 use Cwd;
@@ -78,7 +80,7 @@ sub run_prepush_checks {
 	chdir($d) || die("Cannot cd into $d: $!\n");
 	
 	print("Running tests in $d\n");
-	system("go test") and $errs{"Failed 'go test' in $d"} = 1;
+	system("go test -v -race") and $errs{"Failed 'go test' in $d"} = 1;
 
 	if ($godocdown) {
 	    if (! -f "README.md") {
