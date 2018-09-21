@@ -1,13 +1,18 @@
 #!/usr/bin/env perl
 
-# Pre-push hook for Go projects that end up on github.
-# 
-# Each directory must have a doc.go.
-# For each .go file, a _test.go must exist.
-# In each directory,
-# - `go test -v -race` is run
-# - `godocdown` is run if you have it on your system
-# - `golint` or `golangci-lint` is run if you have it on your system
+# Pre-push hook for Go projects that are pushed to github or to some other
+# git repository.
+#
+# This pre-push hook runs the following tests:
+# - Each directory must have a doc.go.
+# - For each .go file, a _test.go must exist.
+# - In each directory,
+#   - `go test -v -race` must succeed
+#   - `godocdown` is run if you have it on your system
+#   - `golint` or `golangci-lint` is run if you have it on your system
+#
+# These test are applied when the working branch is one of @STRICT_BRANCHES,
+# which defaults to 'origin' and 'master'.
 
 use strict;
 use Cwd;
@@ -15,6 +20,7 @@ use File::Compare;
 use File::Copy;
 use File::Find;
 
+my @STRICT_BRANCHES = ('origin', 'master');	# when to be strict
 my %dirs;					# dirs visited 
 my %errs;		       			# errors found
 my $hookname = '.git/hooks/pre-push';   	# name of prepush hook
@@ -22,6 +28,7 @@ my $godocdown = findbin('godocdown');   	# do we have `godocdown`
 my $golint = findbin('golint');         	# do we have `golint`
 my $golangci_lint = findbin('golangci-lint');   # do we have `golangci_lint`
 
+# Find a program along $PATH.
 sub findbin {
     my $bin = shift;
     for my $e (split(/:/, $ENV{PATH})) {
@@ -30,6 +37,7 @@ sub findbin {
     return undef;
 }
 
+# Die if we have encountered errors.
 sub checkerrs {
     my $errfound = 0;
     for my $k (sort(keys(%errs))) {
@@ -42,6 +50,8 @@ sub checkerrs {
     }
 }
 
+# Helper for find(): check that for every .go there is a _test.go,
+# that there is a doc.go in each directory.
 sub wanted {
     my $basefile = $_;
     my $dir = $File::Find::dir;
@@ -68,6 +78,8 @@ sub wanted {
     }
 }
 
+# Run all pre-push checks: recurse into subdirs and call the checks, refresh
+# the readme, `go test -v race`, run the linter.
 sub run_prepush_checks {
     # Check all subdirs for _test.go and doc.go presence
     find(\&wanted, ("."));
@@ -133,6 +145,32 @@ sub run_prepush_checks {
       unless ($golint or $golangci_lint);
 }
 
+# Return the name of the git branch that we're on.
+sub gitbranch {
+  open(my $if, "git branch |") or die("Cannot run 'git branch': $!\n");
+  my $branch = undef;
+  while (my $line = <$if>) {
+    chomp($line);
+    next unless ($line =~ m{^\*});
+    undef, $branch = split(/\s+/, $line);
+    last;
+  }
+  close($if) or die("'git branch' indicates error\n");
+  die("Failed to determine branch\n") unless ($branch);
+  return $branch;
+}
+
+# Return true if we should run the strict checks, else false.
+sub strictbranch {
+  my $branch = gitbranch();
+  for my $b (@STRICT_BRANCHES) {
+    return 1 if ($branch eq $b);
+  }
+  return undef;
+}
+
+# Install this script as the pre-push hook, called when the first invocation
+# parameter is 'install'.
 sub install_self {
     die("You are not in a git repository (no .git found here)\n")
       unless (-d ".git");
@@ -150,6 +188,7 @@ sub install_self {
     print("Pre-push hook installed.\n");
 }
 
+# Uninstall this script.
 sub uninstall_self {
     die("You are not in a git repository (no .git found here)\n")
       unless (-d ".git");
@@ -169,6 +208,6 @@ if ($ARGV[0] eq "install") {
     install_self();
 } elsif ($ARGV[0] eq "uninstall") {
     uninstall_self();
-} else {
+} elsif (strictbranch()) {
     run_prepush_checks();
 }

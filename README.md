@@ -1,13 +1,19 @@
 # go-prepush-hook
 
-`go-prepush-hook` is a simple Perl script that can install itself as your pre-push hook; i.e., it's run before `git push` actually pushes. It is heavily
-aimed at Go repositories that get pushed to http://github.com.
+`go-prepush-hook` is a simple Perl script that can install itself as your
+pre-push hook; i.e., it's run before `git push` actually pushes. It is heavily
+aimed at Go repositories that get pushed to http://github.com but it can be used
+for all repositories where branches are pushed to.
 
 License: GPLV3, see the file `LICENSE.md`. Basically, do with it
 whatever you wish, but re-distribute any changes you might make
 following the same license rules.
 
 What it does, is:
+
+* Checks are executed when the working branch is `origin` or `master`. On other
+  branches, the checks are skipped - since it's assumed that such branches are
+  "work in progress".
 
 * Every directory must have a `go.doc`.
 
@@ -61,18 +67,20 @@ The actions `install` and `uninstall` are conservative:
 
 ## What if it's too strict?
 
-If you have a `file.go` but really don't want to write a test for it
-(or maybe it's a demo file that doesn't require a test), then just
-create a file `file_test.go` and put in it nothing but the package
-declaration.
+In general, once you merge into `origin` or `master` then you should take the
+time to satisfy all the checks. But if you really must...
 
-If you have a directory that lacks a `doc.go`, then create one. Just
-put in a comment that this is an internal directory that deserves no
-docs, followed by the package declaration.
+*  If you have a `file.go` but really don't want to write a test for it (or
+   maybe it's a demo file that doesn't require a test), then just create a file
+   `file_test.go` and put in it nothing but the package declaration.
+
+*  If you have a directory that lacks a `doc.go`, then create one. Just put in a
+   comment that this is an internal directory that deserves no docs, followed by
+   the package declaration.
 
 ## Caveats
 
-If you have pre-existing `README.md`s, and if you have `godocdown`,
-then they might get overwritten. This script assumes that **all**
-`README.md`s are to be generated from `doc.go`. (But hey, you have any
-`README.md`s in git anyway, so you can always get them back.)
+If you have pre-existing `README.md`s, and if you have `godocdown`, then they
+might get overwritten. This script assumes that **all** `README.md`s are to be
+generated from `doc.go`. (But hey, you have your previous `README.md`s in git
+anyway, so you can always get them back, right?.)
