@@ -23,14 +23,14 @@ What it does, is:
   created from `go.doc`. (If you don't have `godocdown`, then you'll be
   reminded to get it. More information is
   [here](https://github.com/robertkrimen/godocdown).)
-   
+
 * If you have one of the supported linters, then one will be run. The
   linters are tried in the following order (if you don't have a
   linter, then you'll be reminded to get one):
 
   * `golint`, fast but less exhaustive, more
     information is [here](https://github.com/golang/lint)
-   
+
   * `golangci-lint`, exhaustive but slow, more information is
     [here](https://github.com/golangci/golangci-lint)
 
@@ -49,26 +49,22 @@ uses only very standard Perl packages that should be available on all
 
 1. Go to the Go repository that you want this to work with.
 
-1. Run `/where/ever/you/put/it/go-prepush-hook install`.
+1. Run `/where/ever/you/put/it/go-prepush-hook install`. This is conservative
+   in the sense that it won't overwrite pre-existing hooks, it will only
+   create a new hook.
 
 1. Upon the next `git push` of your Go repository, the pre-push hook
    will run.
 
 If you don't want it, then just run
-`/where/ever/you/put/it/go-prepush-hook uninstall`, again from the Go
+`.git/hooks/pre-push uninstall`, again from the Go
 repository where the pre-push hook was active.
-
-The actions `install` and `uninstall` are conservative:
-
-* `install` won't overwrite an existing pre-push hook
-
-* `uninstall` will only uninstall itself; not any other pre-push
-  hooks.
 
 ## What if it's too strict?
 
-In general, once you merge into `origin` or `master` then you should take the
-time to satisfy all the checks. But if you really must...
+In general, once you merge your changes into `origin` or `master`, and you want
+to push that, then you should take the time to satisfy all the checks. But if
+you really must...
 
 *  If you have a `file.go` but really don't want to write a test for it (or
    maybe it's a demo file that doesn't require a test), then just create a file
