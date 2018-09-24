@@ -11,9 +11,10 @@ following the same license rules.
 
 What it does, is:
 
-* Checks are executed when the working branch is `origin` or `master`. On other
-  branches, the checks are skipped - since it's assumed that such branches are
-  "work in progress".
+* Checks are executed when the working branch is `master`. On other branches,
+  the checks are skipped - since it's assumed that such branches are "work in
+  progress". (If you need strictness on other branches, then modify
+  `@STRICT_BRANCHES` in the script.)
 
 * Every directory must have a `go.doc`.
 

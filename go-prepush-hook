@@ -12,7 +12,8 @@
 #   - `golint` or `golangci-lint` is run if you have it on your system
 #
 # These test are applied when the working branch is one of @STRICT_BRANCHES,
-# which defaults to 'origin' and 'master'.
+# which defaults to 'master' but feel free to extend this list if you need
+# strictness in other branches as well..
 
 use strict;
 use Cwd;
@@ -20,7 +21,7 @@ use File::Compare;
 use File::Copy;
 use File::Find;
 
-my @STRICT_BRANCHES = ('origin', 'master');	# when to be strict
+my @STRICT_BRANCHES = ('master');		# when to be strict
 my %dirs;					# dirs visited 
 my %errs;		       			# errors found
 my $hookname = '.git/hooks/pre-push';   	# name of prepush hook
